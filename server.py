@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-Key_path = 'sample.json'
+Key_path = 'C:/Users/kavya/Notebooks/Real-time-ga-api/sample.json'
 TABLE_ID = 149579298
 credentials = service_account.Credentials.from_service_account_file(Key_path)
 scoped_credentials = credentials.with_scopes(['https://www.googleapis.com/auth/analytics/readonly'])
@@ -28,15 +28,17 @@ async def serve_page(request: Request):
 @app.post('/real-time-api-page')
 async def real_time(info: Request):
     req_info = await info.json()
+    print("fuckkkkk")
     with build('analytics', 'v3', credentials=credentials) as service:
         realtime_data = service.data().realtime().get(
             ids=f'ga:{TABLE_ID}',
             dimensions='rt:source,rt:medium,rt:campaign',
             metrics='rt:activeUsers',
-            filters=f'ga:PagePath=~{req_info.page}'
+            filters=f'ga:PagePath=~{req_info["page"]}'
         ).execute()
-
+        print("the hell with this")
         return {"source_medium": realtime_data['rows'], "total": realtime_data['totalsForAllResults']['rt:activeUsers']}
+
 
 @app.post('/real-time-api-minutesAgo')
 async def real_time(info: Request):
@@ -52,7 +54,6 @@ async def real_time(info: Request):
         return {"source_medium": realtime_data['rows'], "total": realtime_data['totalsForAllResults']['rt:activeUsers']}
 
 
-
 if __name__ == "__main__":
     print("Running it on the local host")
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)

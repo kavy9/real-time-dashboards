@@ -12,11 +12,8 @@
 
         pageList = ['/personal-loan','/home-loan']
 
-        source_data = []
 
         function getPageSourceData(page){
-
-            const results = []
             fetch('URL',{
             method:'POST',
             headers:{
@@ -32,11 +29,11 @@
                 console.error('Error:', error);
               });
             return apiResponse['source_medium']
-
         };
 
 
-        const array = [1,2,3,4,5,6,7]
+
+
 
         array.forEach(value=>{
             const filter = document.getElementById("Filter")
