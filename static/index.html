@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Data Visualization</title>
+    <!-- Include Chart.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
+
+</head>
+<body>
+<!--    <div style="width: 80%; margin: 0 auto;">-->
+<!--        <label for="exchangeFilter">Select Exchange:</label>-->
+<!--        <select id="exchangeFilter">-->
+<!--            <option value="nse">NSE</option>-->
+<!--            <option value="bse">BSE</option>-->
+<!--        </select>-->
+<!--        <canvas id="dataChart"></canvas>-->
+
+
+    <!-- HTML elements for filters and display -->
+    <label for="sourceFilter">Source:</label>
+    <select id="sourceFilter"></select>
+
+    <label for="mediumFilter">Medium:</label>
+    <select id="mediumFilter"></select>
+
+    <label for="campaignFilter">Campaign:</label>
+    <select id="campaignFilter"></select>
+
+    <div id="numberDisplay">Numbers will appear here.</div>
+<script>
+// HTML elements for filters and display
+const sourceFilter = document.getElementById("sourceFilter");
+const mediumFilter = document.getElementById("mediumFilter");
+const campaignFilter = document.getElementById("campaignFilter");
+const numberDisplay = document.getElementById("numberDisplay");
+
+// Function to fetch data from API
+async function fetchData() {
+  try {
+
+    const response = await fetch("http://127.0.0.1:8000/real-time-api");
+    const data = await response.json();
+    return data; // Assuming your API returns an array of objects
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
+}
+
+// Function to update filter options
+function updateFilterOptions(data) {
+  const sources = new Set();
+  const mediums = new Set();
+  const campaigns = new Set();
+
+  data.forEach(entry => {
+    sources.add(entry.source);
+    mediums.add(entry.medium);
+    campaigns.add(entry.campaign);
+  });
+
+  populateOptions(sourceFilter, sources);
+  populateOptions(mediumFilter, mediums);
+  populateOptions(campaignFilter, campaigns);
+}
+
+// Helper function to populate select element options
+function populateOptions(selectElement, values) {
+  // Clear existing options
+  selectElement.innerHTML = '';
+
+  // Add 'All' option as the default
+  const allOption = document.createElement('option');
+  allOption.value = '';
+  allOption.textContent = 'All';
+  selectElement.appendChild(allOption);
+
+  // Add options based on values
+  values.forEach(value => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value;
+    selectElement.appendChild(option);
+  });
+}
+
+
+// Function to update number display based on filters
+function updateNumberDisplay(data) {
+  const sourceValue = sourceFilter.value;
+  const mediumValue = mediumFilter.value;
+  const campaignValue = campaignFilter.value;
+
+  const filteredData = data.filter(
+    entry =>
+      (!sourceValue || entry.source === sourceValue) &&
+      (!mediumValue || entry.medium === mediumValue) &&
+      (!campaignValue || entry.campaign === campaignValue)
+  );
+
+  const numbers = filteredData.map(entry => entry.number);
+
+  // Display the numbers in the HTML element
+  numberDisplay.textContent = numbers.length > 0 ? numbers.join(", ") : "No data matches the selected filters.";
+}
+
+// Function to fetch data, update filter options, and update display
+async function updateDisplay() {
+  const data = await fetchData();
+  updateFilterOptions(data);
+  updateNumberDisplay(data);
+}
+
+// Initial update and set interval for fetching data
+updateDisplay();
+setInterval(updateDisplay, 30000); // Update every 30 seconds
+
+// Event listeners for filters
+sourceFilter.addEventListener("change", updateDisplay);
+mediumFilter.addEventListener("change", updateDisplay);
+campaignFilter.addEventListener("change", updateDisplay);
+
+</script>
+</body>
+</html>

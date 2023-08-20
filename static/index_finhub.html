@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Data Visualization</title>
+    <!-- Include Chart.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+    <div style="width: 80%; margin: 0 auto;">
+        <label for="exchangeFilter">Select Exchange:</label>
+        <select id="exchangeFilter">
+            <option value="nse">NSE</option>
+            <option value="bse">BSE</option>
+        </select>
+        <canvas id="dataChart"></canvas>
+    </div>
+
+    <script>
+        // Function to fetch data from the API based on selected exchange
+        async function fetchData(exchange) {
+            const response = await fetch(`https://api.example.com/${exchange}`); // Replace with your API endpoint pattern
+            const data = await response.json();
+            return data;
+        }
+
+        // Function to update the chart with new data
+        async function updateChart() {
+            const exchangeSelect = document.getElementById('exchangeFilter');
+            const selectedExchange = exchangeSelect.value;
+
+            const data = await fetchData(selectedExchange);
+            chart.data.labels.push(new Date().toLocaleTimeString());
+            chart.data.datasets[0].data.push(data);
+            chart.update();
+        }
+
+        // Create initial chart data
+        const initialData = [80.4625, 80.835, 81.28, 80.58, 82.875, 83.365, 85.9975, 88.21, 83.975];
+
+        // Create the chart
+        const ctx = document.getElementById('dataChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'API Data',
+                    data: initialData,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second',
+                            displayFormats: {
+                                second: 'h:mm:ss a'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Call updateChart function every 60 seconds
+        setInterval(updateChart, 60000);
+    </script>
+</body>
+</html>

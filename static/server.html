@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <label for="Filter">Source:</label>
+    <select id="Filter"></select>
+
+    <div id="number">A Number</div>
+    <script>
+        const filter = document.getElementById("Filter")
+
+        pageList = ['/personal-loan','/home-loan']
+
+        source_data = []
+
+        function getPageSourceData(page){
+
+            const results = []
+            fetch('URL',{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+                },
+            body: JSON.stringify({"page":page})
+            })
+              .then(response => response.json())
+              .then(responseData => {
+                const apiResponse = responseData;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+            return apiResponse['source_medium']
+
+        };
+
+
+        const array = [1,2,3,4,5,6,7]
+
+        array.forEach(value=>{
+            const filter = document.getElementById("Filter")
+
+            const option = document.createElement('option')
+            option.value = value
+            option.textContent = value
+            filter.appendChild(option)
+
+        })
+
+        function updateFilter(){
+
+        }
+        function updateNumber(){
+            const number = document.getElementById('number')
+            const filter = document.getElementById('Filter')
+
+            number.textContent = filter.value
+
+        }
+
+        filter.addEventListener('change',updateNumber)
+
+        setInterval(updateDisplay, 30000);
+    </script>
+</body>
+</html>

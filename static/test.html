@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Test</title>
+
+</head>
+<body>
+    <label for="Filter">Source:</label>
+    <select id="Filter"></select>
+
+    <div id="number">A Number</div>
+    <script>
+        const filter = document.getElementById("Filter")
+
+        const array = [1,2,3,4,5,6,7]
+
+        array.forEach(value=>{
+            const filter = document.getElementById("Filter")
+
+            const option = document.createElement('option')
+            option.value = value
+            option.textContent = value
+            filter.appendChild(option)
+
+        })
+
+        function updateNumber(){
+            const number = document.getElementById('number')
+            const filter = document.getElementById('Filter')
+
+            number.textContent = filter.value
+
+        }
+
+        filter.addEventListener('change',updateNumber)
+    </script>
+</body>
+</html>
+
