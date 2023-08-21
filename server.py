@@ -22,7 +22,7 @@ templates = Jinja2Templates(directory="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("server.html", {"request": request})
 
 
 @app.post('/real-time-api-page')
@@ -39,6 +39,26 @@ async def real_time(info: Request):
         print("the hell with this")
         return {"source_medium": realtime_data['rows'], "total": realtime_data['totalsForAllResults']['rt:activeUsers']}
 
+@app.post('/real-time-api-all-page')
+async def real_time(info: Request):
+    req_info = await info.json()
+    responseList = []
+    with build('analytics', 'v3', credentials=credentials) as service:
+        for page in req_info:
+            Dict = {}
+            Dict['product'] = page['product']
+            realtime_data = service.data().realtime().get(
+                ids=f'ga:{TABLE_ID}',
+                dimensions='rt:source,rt:medium,rt:campaign',
+                metrics='rt:activeUsers',
+                filters=f'ga:PagePath=~{page["URL"]}'
+            ).execute()
+
+            Dict['data'] = {"source_medium": realtime_data['rows'], "total": realtime_data['totalsForAllResults']['rt:activeUsers']}
+
+            responseList.append(Dict)
+
+        return responseList
 
 @app.post('/real-time-api-minutesAgo')
 async def real_time(info: Request):

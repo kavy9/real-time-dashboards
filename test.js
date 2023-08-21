@@ -1,28 +1,5 @@
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-    <label for="Filter">Source:</label>
-    <select id="Filter"></select>
-
-    <label for="sourceFilter">Source:</label>
-    <select id="sourceFilter"></select>
-
-    <label for="mediumFilter">Medium:</label>
-    <select id="mediumFilter"></select>
-
-    <label for="campaignFilter">Campaign:</label>
-    <select id="campaignFilter"></select>
-
-    <div id="number">A Number</div>-->
-    <script>
-        const filter = document.getElementById("Filter");
-        const number = document.getElementById('number');
-
-        const sourceFilter = document.getElementById("sourceFilter");
-        const mediumFilter = document.getElementById("mediumFilter");
-        const campaignFilter = document.getElementById("campaignFilter");
+        const filter = document.getElementById("Filter")
+        const number = document.getElementById('number')
         const currentDate = new Date();
 
         pageList = [{'product':'personal_loan','URL':'/personal-loan'},
@@ -55,11 +32,11 @@
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify(req uestData)
           };
 
           try {
-            const response = await fetch('http://127.0.0.1:8000/real-time-api-all-page', requestOptions);
+            const response = await fetch(url, requestOptions);
             const responseData = await response.json();
             return responseData;
           } catch (error) {
@@ -73,7 +50,7 @@
 
             const pageScore = document.createElement('p');
             pageScore.id = 'pagePara';
-            pageScore.textContent = value.product;
+            pageScore.textContent = value;
 
             pageDiv.appendChild(pageScore)
 
@@ -120,18 +97,16 @@
 
         function updateNumbers(data){
             document.querySelectorAll('#number #pageDiv #pagePara').forEach(value =>{
+
                 value.textContent = new Date().getSeconds();
+
             })
 
         }
 
-        const data = await GetAllData(pageList)
-        updateFilters(data)
-<!--        updateNumbers();-->
-<!---->
-<!--        setInterval(updateNumbers, 30000);-->
+
+        updateNumbers();
+
+        setInterval(updateNumbers, 30000);
 
         console.log('it worked')
-</script>
-</body>
-</html>
