@@ -28,7 +28,7 @@
         pageList = [{'product':'personal_loan','URL':'/personal-loan'},
                     {'product':'home_loan','URL':'/home-loan'}]
 
-        const Data = []
+        let Data = []
 
         function getPageSourceData(page){
             fetch("http://127.0.0.1:8000/real-time-api-page",{
@@ -87,12 +87,16 @@
               const mediums = new Set();
               const campaigns = new Set();
 
+<!--              data.forEach(x=>{-->
+<!--                sources.add(x["data"]["source_medium"].map(row => row[0]))-->
+<!--                mediums.add(x["data"]["source_medium"].map(row => row[1]))-->
+<!--                campaigns.add(x["data"]["source_medium"].map(row => row[2]))-->
+<!--              });-->
               data.forEach(x=>{
-                sources.add(x["data"]["source_medium"].map(row => row[0]))
-                mediums.add(x["data"]["source_medium"].map(row => row[1]))
-                campaigns.add(x["data"]["source_medium"].map(row => row[2]))
+                x["data"]["source_medium"].map(row => row[0]).forEach(v=>sources.add(v))
+                x["data"]["source_medium"].map(row => row[1]).forEach(v=>mediums.add(v))
+                x["data"]["source_medium"].map(row => row[2]).forEach(v=>campaigns.add(v))
               });
-
               populateOptions(sourceFilter, sources);
               populateOptions(mediumFilter, mediums);
               populateOptions(campaignFilter, campaigns);
@@ -127,11 +131,12 @@
         }
 
         async function updateDisplay() {
-          const data = await GetAllData(pageList);
+          const data = await GetAllData(pageList).then(V => Data=V);
+
           updateFilters(data);
         }
 
-        setInterval(updateDisplay, 10000);
+        setInterval(updateDisplay, 100000);
 
         console.log('it worked')
 </script>
