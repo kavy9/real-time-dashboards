@@ -3,8 +3,8 @@
     <title></title>
 </head>
 <body>
-    <label for="Filter">Source:</label>
-    <select id="Filter"></select>
+<!--    <label for="Filter">Source:</label>-->
+<!--    <select id="Filter"></select>-->
 
     <label for="sourceFilter">Source:</label>
     <select id="sourceFilter"></select>
@@ -41,6 +41,7 @@
             })
               .then(response => response.json())
               .then(responseData => {
+                Data = responseData
                 return responseData // Output: The API response data
               })
               .catch(error => {
@@ -125,11 +126,12 @@
 
         }
 
-        const data = await GetAllData(pageList)
-        updateFilters(data)
-<!--        updateNumbers();-->
-<!---->
-<!--        setInterval(updateNumbers, 30000);-->
+        async function updateDisplay() {
+          const data = await GetAllData(pageList);
+          updateFilters(data);
+        }
+
+        setInterval(updateDisplay, 10000);
 
         console.log('it worked')
 </script>
