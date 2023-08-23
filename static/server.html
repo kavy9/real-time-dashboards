@@ -144,6 +144,7 @@
           document.querySelectorAll('#number #pageDiv #pagePara').forEach(page => {
             data.forEach(entry => {
               if (entry.product === page.textContent) {
+                console.log("AGKJALJGLJAEG",entry.product,page.textContent)
                 page.textContent = entry.product + ':' + entry.data['total'];
               }
             });
@@ -158,9 +159,10 @@
             const campaignValue = getSelectedOptionValue('campaignFilter');
 
             document.querySelectorAll('#number #pageDiv #pagePara').forEach(page =>{
-
                 data.forEach(A=>{
-                    if(A.product == page.textContent){
+                    console.log("AGKJALJGLJAEG",A.product,page.textContent)
+                    if(page.textContent.includes(A.product)){
+
                           const filteredData = A.data['source_medium'].filter(
                                 entry =>
                                   (!sourceValue || entry[0] === sourceValue) &&
@@ -171,8 +173,6 @@
                           page.textContent = A.product + ':'+ filteredData.reduce((sum, entry) => sum + parseInt(entry[3]), 0);
                     }
                 })
-
-
             })
 
         }
@@ -182,7 +182,7 @@
         async function updateDisplay() {
           const data = await GetAllData(pageList).then(V => Data=V);
           updateFilters(data);
-          updateNumbers(data);
+          firstUpdateNumber(data);
         }
 
         async function updateOnChange() {
@@ -194,8 +194,6 @@
         updateDisplay().catch(e=>console.log(e))
 
         setInterval(updateDisplay, 100000);
-
-
 
         sourceFilter.addEventListener("change", updateOnChange);
         mediumFilter.addEventListener("change", updateOnChange);
