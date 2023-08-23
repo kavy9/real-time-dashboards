@@ -30,6 +30,20 @@
 
         let Data = []
 
+        pageList.forEach(value => {
+            const pageDiv = document.createElement('div');
+            pageDiv.id = 'pageDiv';
+
+            const pageScore = document.createElement('p');
+            pageScore.id = 'pagePara';
+            pageScore.textContent = value.product;
+
+            pageDiv.appendChild(pageScore)
+
+            number.appendChild(pageDiv)
+
+        })
+
         function getPageSourceData(page){
             fetch("http://127.0.0.1:8000/real-time-api-page",{
               method: 'POST',
@@ -68,19 +82,7 @@
             throw error; // Rethrow the error to be handled by the caller
           }
         }
-        pageList.forEach(value => {
-            const pageDiv = document.createElement('div');
-            pageDiv.id = 'pageDiv';
 
-            const pageScore = document.createElement('p');
-            pageScore.id = 'pagePara';
-            pageScore.textContent = value.product;
-
-            pageDiv.appendChild(pageScore)
-
-            number.appendChild(pageDiv)
-
-        })
 
         function updateFilters(data){
               const sources = new Set();
@@ -123,20 +125,81 @@
           });
         }
 
+        //get all the options values
+        function getSelectedOptionValue(elementName){
+          const selectElement = document.getElementById(elementName);
+          const selectedIndex = selectElement.selectedIndex; // Index of the selected option
+          const selectedOption = selectElement.options[selectedIndex]; // Selected <option> element
+          const selectedValue = selectedOption.value;
+
+          return selectedValue
+
+        }
+
+        function firstUpdateNumber(data) {
+          const sourceValue = sourceFilter.value ;
+          const mediumValue = mediumFilter.value ;
+          const campaignValue = campaignFilter.value ;
+
+          document.querySelectorAll('#number #pageDiv #pagePara').forEach(page => {
+            data.forEach(entry => {
+              if (entry.product === page.textContent) {
+                page.textContent = entry.product + ':' + entry.data['total'];
+              }
+            });
+          });
+        }
+
+
         function updateNumbers(data){
-            document.querySelectorAll('#number #pageDiv #pagePara').forEach(value =>{
-                value.textContent = new Date().getSeconds();
+
+            const sourceValue = getSelectedOptionValue('sourceFilter');
+            const mediumValue = getSelectedOptionValue('mediumFilter');
+            const campaignValue = getSelectedOptionValue('campaignFilter');
+
+            document.querySelectorAll('#number #pageDiv #pagePara').forEach(page =>{
+
+                data.forEach(A=>{
+                    if(A.product == page.textContent){
+                          const filteredData = A.data['source_medium'].filter(
+                                entry =>
+                                  (!sourceValue || entry[0] === sourceValue) &&
+                                  (!mediumValue || entry[1] === mediumValue) &&
+                                  (!campaignValue || entry[2] === campaignValue)
+                              );
+
+                          page.textContent = A.product + ':'+ filteredData.reduce((sum, entry) => sum + parseInt(entry[3]), 0);
+                    }
+                })
+
+
             })
 
         }
 
+
+
         async function updateDisplay() {
           const data = await GetAllData(pageList).then(V => Data=V);
-
           updateFilters(data);
+          updateNumbers(data);
         }
 
+        async function updateOnChange() {
+
+          updateNumbers(Data);
+
+        }
+
+        updateDisplay().catch(e=>console.log(e))
+
         setInterval(updateDisplay, 100000);
+
+
+
+        sourceFilter.addEventListener("change", updateOnChange);
+        mediumFilter.addEventListener("change", updateOnChange);
+        campaignFilter.addEventListener("change", updateOnChange);
 
         console.log('it worked')
 </script>
